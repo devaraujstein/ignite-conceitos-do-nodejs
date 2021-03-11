@@ -76,20 +76,20 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { username } = request;
-
-  const {title, deadline} = request.body;
   const {id} = request.params;
-
+  const updatedTodo = request.body;
+  
   const user = users.find(user => user.username === username);
 
-  const todo = user.todos.find(todo => todo.id === id);
+  const todoIndex = user.todos.findIndex(todo => todo.id === id);
 
-  if(!todo){
+  if(todoIndex < 0){
     return response.status(404).send({error: 'Todo doesnt exists! '});
   }
 
-  todo.title = title;
-  todo.deadline = new Date(deadline);
+  const todo = {...user.todos[todoIndex], ...updatedTodo };
+
+  user.todos[todoIndex] = todo;
 
   return response.send(todo);
 
